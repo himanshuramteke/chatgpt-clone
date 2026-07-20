@@ -28,10 +28,13 @@ export const ConversationView = ({
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        prepareSendMessagesRequest: ({ id, messages }) => ({
+        prepareSendMessagesRequest: ({ id, messages, body }) => ({
           body: {
             id,
             message: messages.at(-1),
+            webSearchEnabled:
+              (body as { webSearchEnabled?: boolean } | undefined)
+                ?.webSearchEnabled ?? false,
           },
         }),
       }),
@@ -69,8 +72,8 @@ export const ConversationView = ({
       )}
 
       <ChatComposer
-        onSend={(text) => {
-          void sendMessage({ text });
+        onSend={(text, webSearchEnabled) => {
+          void sendMessage({ text }, { body: { webSearchEnabled } });
         }}
         isSending={status !== "ready"}
         autoFocus

@@ -54,7 +54,14 @@ export async function saveChatMessages(
     if (message.role === "system") continue;
 
     const content = getMessageText(message);
-    const role = message.role === "assistant" ? "ASSISTANT" : "USER";
+    const roleMap = {
+      user: "USER",
+      assistant: "ASSISTANT",
+      tool: "TOOL",
+      system: "SYSTEM",
+    } as const;
+
+    const role = roleMap[message.role];
 
     await prisma.message.upsert({
       where: { id: message.id },
