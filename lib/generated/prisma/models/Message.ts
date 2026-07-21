@@ -27,6 +27,7 @@ export type AggregateMessage = {
 export type MessageMinAggregateOutputType = {
   id: string | null
   conversationId: string | null
+  parentId: string | null
   role: $Enums.MessageRole | null
   status: $Enums.MessageStatus | null
   content: string | null
@@ -37,6 +38,7 @@ export type MessageMinAggregateOutputType = {
 export type MessageMaxAggregateOutputType = {
   id: string | null
   conversationId: string | null
+  parentId: string | null
   role: $Enums.MessageRole | null
   status: $Enums.MessageStatus | null
   content: string | null
@@ -47,6 +49,7 @@ export type MessageMaxAggregateOutputType = {
 export type MessageCountAggregateOutputType = {
   id: number
   conversationId: number
+  parentId: number
   role: number
   status: number
   content: number
@@ -61,6 +64,7 @@ export type MessageCountAggregateOutputType = {
 export type MessageMinAggregateInputType = {
   id?: true
   conversationId?: true
+  parentId?: true
   role?: true
   status?: true
   content?: true
@@ -71,6 +75,7 @@ export type MessageMinAggregateInputType = {
 export type MessageMaxAggregateInputType = {
   id?: true
   conversationId?: true
+  parentId?: true
   role?: true
   status?: true
   content?: true
@@ -81,6 +86,7 @@ export type MessageMaxAggregateInputType = {
 export type MessageCountAggregateInputType = {
   id?: true
   conversationId?: true
+  parentId?: true
   role?: true
   status?: true
   content?: true
@@ -166,6 +172,7 @@ export type MessageGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type MessageGroupByOutputType = {
   id: string
   conversationId: string
+  parentId: string | null
   role: $Enums.MessageRole
   status: $Enums.MessageStatus
   content: string
@@ -199,6 +206,7 @@ export type MessageWhereInput = {
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   id?: Prisma.StringFilter<"Message"> | string
   conversationId?: Prisma.StringFilter<"Message"> | string
+  parentId?: Prisma.StringNullableFilter<"Message"> | string | null
   role?: Prisma.EnumMessageRoleFilter<"Message"> | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusFilter<"Message"> | $Enums.MessageStatus
   content?: Prisma.StringFilter<"Message"> | string
@@ -207,11 +215,15 @@ export type MessageWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
+  parent?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
+  children?: Prisma.MessageListRelationFilter
+  branchAsLeaf?: Prisma.BranchListRelationFilter
 }
 
 export type MessageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -220,6 +232,9 @@ export type MessageOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   conversation?: Prisma.ConversationOrderByWithRelationInput
+  parent?: Prisma.MessageOrderByWithRelationInput
+  children?: Prisma.MessageOrderByRelationAggregateInput
+  branchAsLeaf?: Prisma.BranchOrderByRelationAggregateInput
 }
 
 export type MessageWhereUniqueInput = Prisma.AtLeast<{
@@ -228,6 +243,7 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.MessageWhereInput[]
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   conversationId?: Prisma.StringFilter<"Message"> | string
+  parentId?: Prisma.StringNullableFilter<"Message"> | string | null
   role?: Prisma.EnumMessageRoleFilter<"Message"> | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusFilter<"Message"> | $Enums.MessageStatus
   content?: Prisma.StringFilter<"Message"> | string
@@ -236,11 +252,15 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   conversation?: Prisma.XOR<Prisma.ConversationScalarRelationFilter, Prisma.ConversationWhereInput>
+  parent?: Prisma.XOR<Prisma.MessageNullableScalarRelationFilter, Prisma.MessageWhereInput> | null
+  children?: Prisma.MessageListRelationFilter
+  branchAsLeaf?: Prisma.BranchListRelationFilter
 }, "id">
 
 export type MessageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -259,6 +279,7 @@ export type MessageScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Message"> | string
   conversationId?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  parentId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   role?: Prisma.EnumMessageRoleWithAggregatesFilter<"Message"> | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusWithAggregatesFilter<"Message"> | $Enums.MessageStatus
   content?: Prisma.StringWithAggregatesFilter<"Message"> | string
@@ -278,11 +299,15 @@ export type MessageCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   conversation: Prisma.ConversationCreateNestedOneWithoutMessageInput
+  parent?: Prisma.MessageCreateNestedOneWithoutChildrenInput
+  children?: Prisma.MessageCreateNestedManyWithoutParentInput
+  branchAsLeaf?: Prisma.BranchCreateNestedManyWithoutLeafMessageInput
 }
 
 export type MessageUncheckedCreateInput = {
   id?: string
   conversationId: string
+  parentId?: string | null
   role: $Enums.MessageRole
   status?: $Enums.MessageStatus
   content: string
@@ -290,6 +315,8 @@ export type MessageUncheckedCreateInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  children?: Prisma.MessageUncheckedCreateNestedManyWithoutParentInput
+  branchAsLeaf?: Prisma.BranchUncheckedCreateNestedManyWithoutLeafMessageInput
 }
 
 export type MessageUpdateInput = {
@@ -302,11 +329,15 @@ export type MessageUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessageNestedInput
+  parent?: Prisma.MessageUpdateOneWithoutChildrenNestedInput
+  children?: Prisma.MessageUpdateManyWithoutParentNestedInput
+  branchAsLeaf?: Prisma.BranchUpdateManyWithoutLeafMessageNestedInput
 }
 
 export type MessageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
   content?: Prisma.StringFieldUpdateOperationsInput | string
@@ -314,11 +345,14 @@ export type MessageUncheckedUpdateInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  children?: Prisma.MessageUncheckedUpdateManyWithoutParentNestedInput
+  branchAsLeaf?: Prisma.BranchUncheckedUpdateManyWithoutLeafMessageNestedInput
 }
 
 export type MessageCreateManyInput = {
   id?: string
   conversationId: string
+  parentId?: string | null
   role: $Enums.MessageRole
   status?: $Enums.MessageStatus
   content: string
@@ -342,6 +376,7 @@ export type MessageUpdateManyMutationInput = {
 export type MessageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
   content?: Prisma.StringFieldUpdateOperationsInput | string
@@ -361,9 +396,15 @@ export type MessageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type MessageNullableScalarRelationFilter = {
+  is?: Prisma.MessageWhereInput | null
+  isNot?: Prisma.MessageWhereInput | null
+}
+
 export type MessageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -376,6 +417,7 @@ export type MessageCountOrderByAggregateInput = {
 export type MessageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -386,6 +428,7 @@ export type MessageMaxOrderByAggregateInput = {
 export type MessageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   conversationId?: Prisma.SortOrder
+  parentId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -435,12 +478,86 @@ export type MessageUncheckedUpdateManyWithoutConversationNestedInput = {
   deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
 }
 
+export type MessageCreateNestedOneWithoutChildrenInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutChildrenInput, Prisma.MessageUncheckedCreateWithoutChildrenInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutChildrenInput
+  connect?: Prisma.MessageWhereUniqueInput
+}
+
+export type MessageCreateNestedManyWithoutParentInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutParentInput, Prisma.MessageUncheckedCreateWithoutParentInput> | Prisma.MessageCreateWithoutParentInput[] | Prisma.MessageUncheckedCreateWithoutParentInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutParentInput | Prisma.MessageCreateOrConnectWithoutParentInput[]
+  createMany?: Prisma.MessageCreateManyParentInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
+export type MessageUncheckedCreateNestedManyWithoutParentInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutParentInput, Prisma.MessageUncheckedCreateWithoutParentInput> | Prisma.MessageCreateWithoutParentInput[] | Prisma.MessageUncheckedCreateWithoutParentInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutParentInput | Prisma.MessageCreateOrConnectWithoutParentInput[]
+  createMany?: Prisma.MessageCreateManyParentInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
 export type EnumMessageRoleFieldUpdateOperationsInput = {
   set?: $Enums.MessageRole
 }
 
 export type EnumMessageStatusFieldUpdateOperationsInput = {
   set?: $Enums.MessageStatus
+}
+
+export type MessageUpdateOneWithoutChildrenNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutChildrenInput, Prisma.MessageUncheckedCreateWithoutChildrenInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutChildrenInput
+  upsert?: Prisma.MessageUpsertWithoutChildrenInput
+  disconnect?: Prisma.MessageWhereInput | boolean
+  delete?: Prisma.MessageWhereInput | boolean
+  connect?: Prisma.MessageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutChildrenInput, Prisma.MessageUpdateWithoutChildrenInput>, Prisma.MessageUncheckedUpdateWithoutChildrenInput>
+}
+
+export type MessageUpdateManyWithoutParentNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutParentInput, Prisma.MessageUncheckedCreateWithoutParentInput> | Prisma.MessageCreateWithoutParentInput[] | Prisma.MessageUncheckedCreateWithoutParentInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutParentInput | Prisma.MessageCreateOrConnectWithoutParentInput[]
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutParentInput | Prisma.MessageUpsertWithWhereUniqueWithoutParentInput[]
+  createMany?: Prisma.MessageCreateManyParentInputEnvelope
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutParentInput | Prisma.MessageUpdateWithWhereUniqueWithoutParentInput[]
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutParentInput | Prisma.MessageUpdateManyWithWhereWithoutParentInput[]
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+}
+
+export type MessageUncheckedUpdateManyWithoutParentNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutParentInput, Prisma.MessageUncheckedCreateWithoutParentInput> | Prisma.MessageCreateWithoutParentInput[] | Prisma.MessageUncheckedCreateWithoutParentInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutParentInput | Prisma.MessageCreateOrConnectWithoutParentInput[]
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutParentInput | Prisma.MessageUpsertWithWhereUniqueWithoutParentInput[]
+  createMany?: Prisma.MessageCreateManyParentInputEnvelope
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutParentInput | Prisma.MessageUpdateWithWhereUniqueWithoutParentInput[]
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutParentInput | Prisma.MessageUpdateManyWithWhereWithoutParentInput[]
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+}
+
+export type MessageCreateNestedOneWithoutBranchAsLeafInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutBranchAsLeafInput, Prisma.MessageUncheckedCreateWithoutBranchAsLeafInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutBranchAsLeafInput
+  connect?: Prisma.MessageWhereUniqueInput
+}
+
+export type MessageUpdateOneWithoutBranchAsLeafNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutBranchAsLeafInput, Prisma.MessageUncheckedCreateWithoutBranchAsLeafInput>
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutBranchAsLeafInput
+  upsert?: Prisma.MessageUpsertWithoutBranchAsLeafInput
+  disconnect?: Prisma.MessageWhereInput | boolean
+  delete?: Prisma.MessageWhereInput | boolean
+  connect?: Prisma.MessageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MessageUpdateToOneWithWhereWithoutBranchAsLeafInput, Prisma.MessageUpdateWithoutBranchAsLeafInput>, Prisma.MessageUncheckedUpdateWithoutBranchAsLeafInput>
 }
 
 export type MessageCreateWithoutConversationInput = {
@@ -452,10 +569,14 @@ export type MessageCreateWithoutConversationInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  parent?: Prisma.MessageCreateNestedOneWithoutChildrenInput
+  children?: Prisma.MessageCreateNestedManyWithoutParentInput
+  branchAsLeaf?: Prisma.BranchCreateNestedManyWithoutLeafMessageInput
 }
 
 export type MessageUncheckedCreateWithoutConversationInput = {
   id?: string
+  parentId?: string | null
   role: $Enums.MessageRole
   status?: $Enums.MessageStatus
   content: string
@@ -463,6 +584,8 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  children?: Prisma.MessageUncheckedCreateNestedManyWithoutParentInput
+  branchAsLeaf?: Prisma.BranchUncheckedCreateNestedManyWithoutLeafMessageInput
 }
 
 export type MessageCreateOrConnectWithoutConversationInput = {
@@ -497,6 +620,7 @@ export type MessageScalarWhereInput = {
   NOT?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
   id?: Prisma.StringFilter<"Message"> | string
   conversationId?: Prisma.StringFilter<"Message"> | string
+  parentId?: Prisma.StringNullableFilter<"Message"> | string | null
   role?: Prisma.EnumMessageRoleFilter<"Message"> | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusFilter<"Message"> | $Enums.MessageStatus
   content?: Prisma.StringFilter<"Message"> | string
@@ -506,8 +630,207 @@ export type MessageScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Message"> | Date | string
 }
 
+export type MessageCreateWithoutChildrenInput = {
+  id?: string
+  role: $Enums.MessageRole
+  status?: $Enums.MessageStatus
+  content: string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversation: Prisma.ConversationCreateNestedOneWithoutMessageInput
+  parent?: Prisma.MessageCreateNestedOneWithoutChildrenInput
+  branchAsLeaf?: Prisma.BranchCreateNestedManyWithoutLeafMessageInput
+}
+
+export type MessageUncheckedCreateWithoutChildrenInput = {
+  id?: string
+  conversationId: string
+  parentId?: string | null
+  role: $Enums.MessageRole
+  status?: $Enums.MessageStatus
+  content: string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branchAsLeaf?: Prisma.BranchUncheckedCreateNestedManyWithoutLeafMessageInput
+}
+
+export type MessageCreateOrConnectWithoutChildrenInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutChildrenInput, Prisma.MessageUncheckedCreateWithoutChildrenInput>
+}
+
+export type MessageCreateWithoutParentInput = {
+  id?: string
+  role: $Enums.MessageRole
+  status?: $Enums.MessageStatus
+  content: string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversation: Prisma.ConversationCreateNestedOneWithoutMessageInput
+  children?: Prisma.MessageCreateNestedManyWithoutParentInput
+  branchAsLeaf?: Prisma.BranchCreateNestedManyWithoutLeafMessageInput
+}
+
+export type MessageUncheckedCreateWithoutParentInput = {
+  id?: string
+  conversationId: string
+  role: $Enums.MessageRole
+  status?: $Enums.MessageStatus
+  content: string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  children?: Prisma.MessageUncheckedCreateNestedManyWithoutParentInput
+  branchAsLeaf?: Prisma.BranchUncheckedCreateNestedManyWithoutLeafMessageInput
+}
+
+export type MessageCreateOrConnectWithoutParentInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutParentInput, Prisma.MessageUncheckedCreateWithoutParentInput>
+}
+
+export type MessageCreateManyParentInputEnvelope = {
+  data: Prisma.MessageCreateManyParentInput | Prisma.MessageCreateManyParentInput[]
+  skipDuplicates?: boolean
+}
+
+export type MessageUpsertWithoutChildrenInput = {
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutChildrenInput, Prisma.MessageUncheckedUpdateWithoutChildrenInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutChildrenInput, Prisma.MessageUncheckedCreateWithoutChildrenInput>
+  where?: Prisma.MessageWhereInput
+}
+
+export type MessageUpdateToOneWithWhereWithoutChildrenInput = {
+  where?: Prisma.MessageWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutChildrenInput, Prisma.MessageUncheckedUpdateWithoutChildrenInput>
+}
+
+export type MessageUpdateWithoutChildrenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
+  status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessageNestedInput
+  parent?: Prisma.MessageUpdateOneWithoutChildrenNestedInput
+  branchAsLeaf?: Prisma.BranchUpdateManyWithoutLeafMessageNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutChildrenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
+  status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branchAsLeaf?: Prisma.BranchUncheckedUpdateManyWithoutLeafMessageNestedInput
+}
+
+export type MessageUpsertWithWhereUniqueWithoutParentInput = {
+  where: Prisma.MessageWhereUniqueInput
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutParentInput, Prisma.MessageUncheckedUpdateWithoutParentInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutParentInput, Prisma.MessageUncheckedCreateWithoutParentInput>
+}
+
+export type MessageUpdateWithWhereUniqueWithoutParentInput = {
+  where: Prisma.MessageWhereUniqueInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutParentInput, Prisma.MessageUncheckedUpdateWithoutParentInput>
+}
+
+export type MessageUpdateManyWithWhereWithoutParentInput = {
+  where: Prisma.MessageScalarWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateManyMutationInput, Prisma.MessageUncheckedUpdateManyWithoutParentInput>
+}
+
+export type MessageCreateWithoutBranchAsLeafInput = {
+  id?: string
+  role: $Enums.MessageRole
+  status?: $Enums.MessageStatus
+  content: string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversation: Prisma.ConversationCreateNestedOneWithoutMessageInput
+  parent?: Prisma.MessageCreateNestedOneWithoutChildrenInput
+  children?: Prisma.MessageCreateNestedManyWithoutParentInput
+}
+
+export type MessageUncheckedCreateWithoutBranchAsLeafInput = {
+  id?: string
+  conversationId: string
+  parentId?: string | null
+  role: $Enums.MessageRole
+  status?: $Enums.MessageStatus
+  content: string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  children?: Prisma.MessageUncheckedCreateNestedManyWithoutParentInput
+}
+
+export type MessageCreateOrConnectWithoutBranchAsLeafInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutBranchAsLeafInput, Prisma.MessageUncheckedCreateWithoutBranchAsLeafInput>
+}
+
+export type MessageUpsertWithoutBranchAsLeafInput = {
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutBranchAsLeafInput, Prisma.MessageUncheckedUpdateWithoutBranchAsLeafInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutBranchAsLeafInput, Prisma.MessageUncheckedCreateWithoutBranchAsLeafInput>
+  where?: Prisma.MessageWhereInput
+}
+
+export type MessageUpdateToOneWithWhereWithoutBranchAsLeafInput = {
+  where?: Prisma.MessageWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutBranchAsLeafInput, Prisma.MessageUncheckedUpdateWithoutBranchAsLeafInput>
+}
+
+export type MessageUpdateWithoutBranchAsLeafInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
+  status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessageNestedInput
+  parent?: Prisma.MessageUpdateOneWithoutChildrenNestedInput
+  children?: Prisma.MessageUpdateManyWithoutParentNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutBranchAsLeafInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
+  status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  children?: Prisma.MessageUncheckedUpdateManyWithoutParentNestedInput
+}
+
 export type MessageCreateManyConversationInput = {
   id?: string
+  parentId?: string | null
   role: $Enums.MessageRole
   status?: $Enums.MessageStatus
   content: string
@@ -526,10 +849,28 @@ export type MessageUpdateWithoutConversationInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  parent?: Prisma.MessageUpdateOneWithoutChildrenNestedInput
+  children?: Prisma.MessageUpdateManyWithoutParentNestedInput
+  branchAsLeaf?: Prisma.BranchUpdateManyWithoutLeafMessageNestedInput
 }
 
 export type MessageUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
+  status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  children?: Prisma.MessageUncheckedUpdateManyWithoutParentNestedInput
+  branchAsLeaf?: Prisma.BranchUncheckedUpdateManyWithoutLeafMessageNestedInput
+}
+
+export type MessageUncheckedUpdateManyWithoutConversationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
   content?: Prisma.StringFieldUpdateOperationsInput | string
@@ -539,7 +880,19 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type MessageUncheckedUpdateManyWithoutConversationInput = {
+export type MessageCreateManyParentInput = {
+  id?: string
+  conversationId: string
+  role: $Enums.MessageRole
+  status?: $Enums.MessageStatus
+  content: string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MessageUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
@@ -548,13 +901,81 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversation?: Prisma.ConversationUpdateOneRequiredWithoutMessageNestedInput
+  children?: Prisma.MessageUpdateManyWithoutParentNestedInput
+  branchAsLeaf?: Prisma.BranchUpdateManyWithoutLeafMessageNestedInput
 }
 
+export type MessageUncheckedUpdateWithoutParentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
+  status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  children?: Prisma.MessageUncheckedUpdateManyWithoutParentNestedInput
+  branchAsLeaf?: Prisma.BranchUncheckedUpdateManyWithoutLeafMessageNestedInput
+}
+
+export type MessageUncheckedUpdateManyWithoutParentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMessageRoleFieldUpdateOperationsInput | $Enums.MessageRole
+  status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  parts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type MessageCountOutputType
+ */
+
+export type MessageCountOutputType = {
+  children: number
+  branchAsLeaf: number
+}
+
+export type MessageCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  children?: boolean | MessageCountOutputTypeCountChildrenArgs
+  branchAsLeaf?: boolean | MessageCountOutputTypeCountBranchAsLeafArgs
+}
+
+/**
+ * MessageCountOutputType without action
+ */
+export type MessageCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageCountOutputType
+   */
+  select?: Prisma.MessageCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MessageCountOutputType without action
+ */
+export type MessageCountOutputTypeCountChildrenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
+
+/**
+ * MessageCountOutputType without action
+ */
+export type MessageCountOutputTypeCountBranchAsLeafArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BranchWhereInput
+}
 
 
 export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   conversationId?: boolean
+  parentId?: boolean
   role?: boolean
   status?: boolean
   content?: boolean
@@ -563,11 +984,16 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   updatedAt?: boolean
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  parent?: boolean | Prisma.Message$parentArgs<ExtArgs>
+  children?: boolean | Prisma.Message$childrenArgs<ExtArgs>
+  branchAsLeaf?: boolean | Prisma.Message$branchAsLeafArgs<ExtArgs>
+  _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   conversationId?: boolean
+  parentId?: boolean
   role?: boolean
   status?: boolean
   content?: boolean
@@ -576,11 +1002,13 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  parent?: boolean | Prisma.Message$parentArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   conversationId?: boolean
+  parentId?: boolean
   role?: boolean
   status?: boolean
   content?: boolean
@@ -589,11 +1017,13 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  parent?: boolean | Prisma.Message$parentArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectScalar = {
   id?: boolean
   conversationId?: boolean
+  parentId?: boolean
   role?: boolean
   status?: boolean
   content?: boolean
@@ -603,25 +1033,35 @@ export type MessageSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "role" | "status" | "content" | "parts" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "parentId" | "role" | "status" | "content" | "parts" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  parent?: boolean | Prisma.Message$parentArgs<ExtArgs>
+  children?: boolean | Prisma.Message$childrenArgs<ExtArgs>
+  branchAsLeaf?: boolean | Prisma.Message$branchAsLeafArgs<ExtArgs>
+  _count?: boolean | Prisma.MessageCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MessageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  parent?: boolean | Prisma.Message$parentArgs<ExtArgs>
 }
 export type MessageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
+  parent?: boolean | Prisma.Message$parentArgs<ExtArgs>
 }
 
 export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Message"
   objects: {
     conversation: Prisma.$ConversationPayload<ExtArgs>
+    parent: Prisma.$MessagePayload<ExtArgs> | null
+    children: Prisma.$MessagePayload<ExtArgs>[]
+    branchAsLeaf: Prisma.$BranchPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     conversationId: string
+    parentId: string | null
     role: $Enums.MessageRole
     status: $Enums.MessageStatus
     content: string
@@ -1024,6 +1464,9 @@ readonly fields: MessageFieldRefs;
 export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   conversation<T extends Prisma.ConversationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ConversationDefaultArgs<ExtArgs>>): Prisma.Prisma__ConversationClient<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  parent<T extends Prisma.Message$parentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$parentArgs<ExtArgs>>): Prisma.Prisma__MessageClient<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  children<T extends Prisma.Message$childrenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  branchAsLeaf<T extends Prisma.Message$branchAsLeafArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$branchAsLeafArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1055,6 +1498,7 @@ export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.
 export interface MessageFieldRefs {
   readonly id: Prisma.FieldRef<"Message", 'String'>
   readonly conversationId: Prisma.FieldRef<"Message", 'String'>
+  readonly parentId: Prisma.FieldRef<"Message", 'String'>
   readonly role: Prisma.FieldRef<"Message", 'MessageRole'>
   readonly status: Prisma.FieldRef<"Message", 'MessageStatus'>
   readonly content: Prisma.FieldRef<"Message", 'String'>
@@ -1460,6 +1904,73 @@ export type MessageDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Messages to delete.
    */
   limit?: number
+}
+
+/**
+ * Message.parent
+ */
+export type Message$parentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+}
+
+/**
+ * Message.children
+ */
+export type Message$childrenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * Message.branchAsLeaf
+ */
+export type Message$branchAsLeafArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Branch
+   */
+  select?: Prisma.BranchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Branch
+   */
+  omit?: Prisma.BranchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BranchInclude<ExtArgs> | null
+  where?: Prisma.BranchWhereInput
+  orderBy?: Prisma.BranchOrderByWithRelationInput | Prisma.BranchOrderByWithRelationInput[]
+  cursor?: Prisma.BranchWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BranchScalarFieldEnum | Prisma.BranchScalarFieldEnum[]
 }
 
 /**

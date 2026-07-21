@@ -2,7 +2,7 @@
 
 import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
 import type { ChatStatus } from "ai";
-import { GlobeIcon } from "lucide-react";
+import { GlobeIcon, GitBranchIcon } from "lucide-react";
 
 import {
   Conversation,
@@ -15,6 +15,7 @@ import {
   MessageResponse,
 } from "@/components/ai-elements/message";
 import { Loader } from "@/components/ai-elements/loader";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 function getMessageText(message: UIMessage) {
@@ -33,9 +34,14 @@ function getWebSearchParts(message: UIMessage) {
 type ChatMessagesProps = {
   messages: UIMessage[];
   status: ChatStatus;
+  onBranchFrom: (messageId: string) => void;
 };
 
-export function ChatMessages({ messages, status }: ChatMessagesProps) {
+export function ChatMessages({
+  messages,
+  status,
+  onBranchFrom,
+}: ChatMessagesProps) {
   const isWaiting = status === "submitted" && messages.at(-1)?.role === "user";
 
   return (
@@ -45,7 +51,7 @@ export function ChatMessages({ messages, status }: ChatMessagesProps) {
           const searchParts = getWebSearchParts(message);
 
           return (
-            <Message key={message.id} from={message.role}>
+            <Message key={message.id} from={message.role} className="group">
               <MessageContent>
                 {searchParts.map((part, i) => {
                   const isDone = part.state === "output-available";
@@ -65,6 +71,17 @@ export function ChatMessages({ messages, status }: ChatMessagesProps) {
                 })}
                 <MessageResponse>{getMessageText(message)}</MessageResponse>
               </MessageContent>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 gap-1 self-start rounded-full px-2 text-[11px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                onClick={() => onBranchFrom(message.id)}
+              >
+                <GitBranchIcon className="size-3" />
+                Branch from here
+              </Button>
             </Message>
           );
         })}
