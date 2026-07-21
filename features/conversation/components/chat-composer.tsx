@@ -19,7 +19,7 @@ type ChatComposerProps = {
 export function ChatComposer({
   onSend,
   isSending = false,
-  placeholder = "Message ChaiGPT…",
+  placeholder = "Message ChaiGPT...",
   className,
   autoFocus = false,
 }: ChatComposerProps) {

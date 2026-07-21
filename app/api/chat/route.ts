@@ -1,7 +1,5 @@
-import {
-  loadMessages,
-  saveChatMessages,
-} from "@/features/ai/actions/chat-actions";
+import { saveChatMessages } from "@/features/ai/actions/chat-actions";
+import { getBranchMessages } from "@/features/ai/actions/branch-actions";
 import { getChatModel } from "@/features/ai/llm/model";
 import { websearchTool } from "@/features/ai/tools/web-search-tool";
 import { requireUser } from "@/features/auth/actions/requireUser";
@@ -23,31 +21,38 @@ export async function POST(req: Request) {
   const {
     message,
     id,
+    branchId,
     webSearchEnabled = false,
   }: {
     message: UIMessage;
     id: string;
+    branchId: string;
     webSearchEnabled?: boolean;
   } = await req.json();
 
-  if (!message || !id) {
-    return new Response("Missing message or conversation id", { status: 400 });
+  if (!message || !id || !branchId) {
+    return new Response("Missing message, conversation id, or branch id", {
+      status: 400,
+    });
   }
 
   const user = await requireUser();
 
   const conversation = await prisma.conversation.findFirst({
-    where: {
-      id,
-      userId: user.id,
-    },
+    where: { id, userId: user.id },
   });
-
   if (!conversation) {
     return new Response("Conversation not found", { status: 404 });
   }
 
-  const previousMessages = await loadMessages(id);
+  const branch = await prisma.branch.findFirst({
+    where: { id: branchId, conversationId: id },
+  });
+  if (!branch) {
+    return new Response("Branch not found", { status: 404 });
+  }
+
+  const previousMessages = await getBranchMessages(branchId);
 
   const alreadySaved = previousMessages.some(
     (storedMessage) => storedMessage.id === message.id,
@@ -58,7 +63,7 @@ export async function POST(req: Request) {
     : [...previousMessages, message];
 
   if (!alreadySaved) {
-    await saveChatMessages(id, [message]);
+    await saveChatMessages(id, branchId, [message]);
   }
 
   const result = streamText({
@@ -110,7 +115,12 @@ When using webSearch:
       generateMessageId: createIdGenerator({ prefix: "msg", size: 16 }),
       onEnd: async ({ messages: finalMessages }) => {
         try {
-          await saveChatMessages(id, finalMessages, { updateTitle: false });
+          const newMessages = finalMessages.filter(
+            (m) => !previousMessages.some((p) => p.id === m.id),
+          );
+          await saveChatMessages(id, branchId, newMessages, {
+            updateTitle: false,
+          });
         } catch (error) {
           console.error(error);
         }

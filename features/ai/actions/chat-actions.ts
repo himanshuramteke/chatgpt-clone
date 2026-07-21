@@ -1,26 +1,39 @@
 "use server";
 
-import { isTextUIPart, type UIMessage } from "ai";
-import { Prisma } from "@/lib/generated/prisma/client";
+import { type UIMessage } from "ai";
 import prisma from "@/lib/db";
+import { requireUser } from "@/features/auth/actions/requireUser";
+import { extractPlainText, toPrismaRole, toUIRole } from "../utils/role-map";
 
-function getMessageText(message: UIMessage) {
-  return message.parts
-    .filter(isTextUIPart)
-    .map((part) => part.text)
-    .join("");
-}
+export async function createConversationWithDefaultBranch(data: {
+  title?: string;
+  model?: string;
+}) {
+  const user = await requireUser();
 
-function toUIMessageParts(
-  parts: Prisma.JsonValue | null,
-  content: string,
-): UIMessage["parts"] {
-  const stored = parts as UIMessage["parts"] | null;
-  if (Array.isArray(stored) && stored.length > 0) {
-    return stored;
+  if (!user) {
+    throw new Error("Unauthorized");
   }
 
-  return [{ type: "text", text: content }];
+  return prisma.$transaction(async (tx) => {
+    const conversation = await tx.conversation.create({
+      data: {
+        userId: user.id,
+        title: data.title ?? "New Chat",
+        model: data.model,
+      },
+    });
+
+    const branch = await tx.branch.create({
+      data: {
+        conversationId: conversation.id,
+        name: "Main",
+        isDefault: true,
+      },
+    });
+
+    return { conversation, branch };
+  });
 }
 
 export async function loadMessages(
@@ -33,70 +46,59 @@ export async function loadMessages(
 
   return rows.map((row) => ({
     id: row.id,
-    role: row.role === "ASSISTANT" ? "assistant" : "user",
-    parts: toUIMessageParts(row.parts, row.content),
+    role: toUIRole(row.role),
+    parts: (row.parts as UIMessage["parts"] | null) ?? [
+      { type: "text", text: row.content },
+    ],
   }));
 }
 
-type SaveChatMessagesOptions = {
-  updateTitle?: boolean;
-};
-
-/** Upsert UIMessages for a conversation. */
 export async function saveChatMessages(
   conversationId: string,
+  branchId: string,
   messages: UIMessage[],
-  options: SaveChatMessagesOptions = {},
+  _opts?: { updateTitle?: boolean },
 ) {
-  const { updateTitle = true } = options;
+  if (messages.length === 0) return;
+
+  const branch = await prisma.branch.findUniqueOrThrow({
+    where: { id: branchId },
+  });
+  let parentId = branch.leafMessageId;
 
   for (const message of messages) {
-    if (message.role === "system") continue;
-
-    const content = getMessageText(message);
-    const roleMap = {
-      user: "USER",
-      assistant: "ASSISTANT",
-      tool: "TOOL",
-      system: "SYSTEM",
-    } as const;
-
-    const role = roleMap[message.role];
+    const content = extractPlainText(message.parts);
 
     await prisma.message.upsert({
       where: { id: message.id },
+      update: {
+        role: toPrismaRole(message.role),
+        content,
+        parts: message.parts as object,
+        status: "COMPLETE",
+      },
       create: {
         id: message.id,
         conversationId,
-        role,
-        status: "COMPLETE",
+        parentId,
+        role: toPrismaRole(message.role),
         content,
-        parts: message.parts as Prisma.InputJsonValue,
-      },
-      update: {
-        content,
-        parts: message.parts as Prisma.InputJsonValue,
+        parts: message.parts as object,
         status: "COMPLETE",
       },
     });
+
+    parentId = message.id;
   }
 
-  const conversation = await prisma.conversation.findUniqueOrThrow({
-    where: { id: conversationId },
-    select: { title: true },
-  });
-
-  const firstUser = messages.find((message) => message.role === "user");
-  const firstUserText = firstUser ? getMessageText(firstUser).trim() : "";
-
-  await prisma.conversation.update({
-    where: { id: conversationId },
-    data: {
-      lastMessageAt: new Date(),
-      title:
-        updateTitle && conversation.title === "New Chat" && firstUserText
-          ? firstUserText.slice(0, 48)
-          : conversation.title,
-    },
-  });
+  await prisma.$transaction([
+    prisma.branch.update({
+      where: { id: branchId },
+      data: { leafMessageId: parentId },
+    }),
+    prisma.conversation.update({
+      where: { id: conversationId },
+      data: { lastMessageAt: new Date() },
+    }),
+  ]);
 }
